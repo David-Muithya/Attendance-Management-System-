@@ -1,0 +1,21 @@
+
+
+**Database Name: attendancemsystem**
+
+**Developed by Surya Joshi**
+
+**Recommended PHP Version 5.6 and Newer**
+
+
+**Admin Login Details**
+
+Email   : jsurya860@gmail.com
+Password: admin
+
+
+**Teacher Login Details**
+
+Email   : jwood@mail.com
+Password: pass123
+
+**Default password for teacher's account: pass123**
