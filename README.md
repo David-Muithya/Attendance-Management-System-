@@ -110,10 +110,4 @@ The **Attendance Management System** is a web-based application designed to auto
 
 ---
 
-## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-This README template covers the necessary sections you might need for your project, and you can modify the details to fit your specific system.
