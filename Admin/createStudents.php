@@ -52,13 +52,13 @@ if (isset($_POST['save'])) {
               $mail->isSMTP();
               $mail->Host = 'smtp.gmail.com'; // Your SMTP server
               $mail->SMTPAuth = true;
-              $mail->Username = 'jsurya860@gmail.com'; // SMTP username
-              $mail->Password = 'vgmwvfxetkvysbgv'; // SMTP password
+              $mail->Username = '*******'; // SMTP username
+              $mail->Password = '********'; // SMTP password
               $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
               $mail->Port = 587;
 
               // Recipients
-              $mail->setFrom('jsurya860@gmail.com', 'AMS System');
+              $mail->setFrom('example@gmail.com', 'AMS System');
               $mail->addAddress($email, $firstName . ' ' . $lastName); // Student's email
 
               // Content
