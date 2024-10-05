@@ -52,13 +52,13 @@ if (isset($_POST['save'])) {
               $mail->isSMTP();
               $mail->Host = 'smtp.gmail.com'; // Your SMTP server
               $mail->SMTPAuth = true;
-              $mail->Username = '*******'; // SMTP username
-              $mail->Password = '********'; // SMTP password
+              $mail->Username = 'jsurya860@gmail.com'; // SMTP username
+              $mail->Password = 'vgmwvfxetkvysbgv'; // SMTP password
               $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
               $mail->Port = 587;
 
               // Recipients
-              $mail->setFrom('example@gmail.com', 'AMS System');
+              $mail->setFrom('jsurya860@gmail.com', 'AMS System');
               $mail->addAddress($email, $firstName . ' ' . $lastName); // Student's email
 
               // Content
@@ -99,7 +99,6 @@ if (isset($_GET['Id']) && isset($_GET['action'])) {
     if (isset($_POST['update'])) {
       $firstName = $_POST['firstName'];
       $lastName = $_POST['lastName'];
-      $otherName = $_POST['otherName'];
       $email = $_POST['email'];
       $classId = $_POST['classId'];
       $classArmId = $_POST['classArmId'];
@@ -119,7 +118,6 @@ if (isset($_GET['Id']) && isset($_GET['action'])) {
         $updateQuery = mysqli_query($conn, "UPDATE tblstudents SET 
                   firstName='$firstName',
                   lastName='$lastName',
-                  otherName='$otherName',
                   email='$email',
                   classId='$classId',
                   classArmId='$classArmId'
@@ -192,8 +190,8 @@ if (isset($_POST['import']) && isset($_FILES['csvFile'])) {
         $firstName = $data[0];
         $lastName = $data[1];
         $email = $data[2];
-        $classId = $data[3];
-        $classArmId = $data[4];
+        $className = $data[3];
+        $classArmName = $data[4];
         $dateCreated = date("Y-m-d");
 
         $sampPass = "pwd123";
@@ -206,6 +204,22 @@ if (isset($_POST['import']) && isset($_FILES['csvFile'])) {
         $nextNumber = str_pad((int)$lastNumber + 1, 2, "0", STR_PAD_LEFT);
         $admissionNumber = "ASM" . $nextNumber;
 
+         // Fetch class ID
+         $classQuery = mysqli_query($conn, "SELECT Id FROM tblclass WHERE className = '$className'");
+         if (mysqli_num_rows($classQuery) == 0) {
+             throw new Exception("Class '$className' does not exist.");
+         }
+         $classRow = mysqli_fetch_assoc($classQuery);
+         $classId = $classRow['Id'];
+
+          // Fetch class arm ID
+          $classArmQuery = mysqli_query($conn, "SELECT Id FROM tblclassarms WHERE classArmName = '$classArmName'");
+          if (mysqli_num_rows($classArmQuery) == 0) {
+              throw new Exception("Class Arm '$classArmName' does not exist.");
+          }
+          $classArmRow = mysqli_fetch_assoc($classArmQuery);
+          $classArmId = $classArmRow['Id'];
+          
         // Check if the email already exists
         $checkEmail = mysqli_query($conn, "SELECT * FROM tblstudents WHERE email = '$email'");
         if (mysqli_num_rows($checkEmail) > 0) {

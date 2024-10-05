@@ -98,7 +98,6 @@ $rrw = $rs->fetch_assoc();
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Email Address</th>
-                            <th>Other Name</th>
                             <th>Admission No</th>
                             <th>Class</th>
                             <th>Class Arm</th>
@@ -109,7 +108,7 @@ $rrw = $rs->fetch_assoc();
 
                           <?php
                           $query = "SELECT tblstudents.Id,tblclass.className,tblclassarms.classArmName,tblclassarms.Id AS classArmId,tblstudents.firstName,
-                      tblstudents.lastName,tblstudents.email, tblstudents.otherName,tblstudents.admissionNumber,tblstudents.dateCreated
+                      tblstudents.lastName, tblstudents.email, tblstudents.admissionNumber, tblstudents.dateCreated
                       FROM tblstudents
                       INNER JOIN tblclass ON tblclass.Id = tblstudents.classId
                       INNER JOIN tblclassarms ON tblclassarms.Id = tblstudents.classArmId
@@ -127,7 +126,6 @@ $rrw = $rs->fetch_assoc();
                                 <td>" . $rows['firstName'] . "</td>
                                 <td>" . $rows['lastName'] . "</td>
                                 <td>" . $rows['email'] . "</td>
-                                <td>" . $rows['otherName'] . "</td>
                                 <td>" . $rows['admissionNumber'] . "</td>
                                 <td>" . $rows['className'] . "</td>
                                 <td>" . $rows['classArmName'] . "</td>

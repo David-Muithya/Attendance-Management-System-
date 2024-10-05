@@ -19,19 +19,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $hashedNewPassword = md5($newPassword);
 
     // Check if the old password is correct
-    $checkPasswordQuery = "SELECT password FROM tblclassteacher WHERE emailAddress = '$email'";
+    $checkPasswordQuery = "SELECT password, password_changed FROM tblclassteacher WHERE emailAddress = '$email'";
     $result = mysqli_query($conn, $checkPasswordQuery);
 
     if ($result && mysqli_num_rows($result) > 0) {
         $row = mysqli_fetch_assoc($result);
         $currentPassword = $row['password'];
+        $passwordChanged = $row['password_changed'];
 
         // Verify the old password
         if ($currentPassword === $hashedOldPassword) {
             // Check if new password and confirmation match
             if ($newPassword === $confirmPassword) {
                 // Update password for teacher with associated email in tblclassteacher
-                $updateQuery = "UPDATE tblclassteacher SET password = '$hashedNewPassword' WHERE emailAddress = '$email'";
+                $updateQuery = "UPDATE tblclassteacher SET password = '$hashedNewPassword', password_changed = 1 WHERE emailAddress = '$email'";
 
                 // Execute the update query
                 if (mysqli_query($conn, $updateQuery)) {
@@ -50,6 +51,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error_message = "Old password is incorrect.";
         }
     } 
+}
+
+// Check if the user has already changed their password
+$email = $_SESSION['emailAddress'];
+$passwordCheckQuery = "SELECT password_changed FROM tblclassteacher WHERE emailAddress = '$email'";
+$result = mysqli_query($conn, $passwordCheckQuery);
+$passwordChanged = false;
+
+if ($result && mysqli_num_rows($result) > 0) {
+    $row = mysqli_fetch_assoc($result);
+    $passwordChanged = $row['password_changed'] == 1; // true if changed
 }
 ?>
 
@@ -106,7 +118,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                             <label for="confirm_password">Confirm New Password</label>
                                             <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
                                         </div>
-                                        <button type="submit" class="btn btn-primary">Change Password</button>
+                                        <button type="submit" class="btn btn-primary" <?php echo $passwordChanged ? 'disabled' : ''; ?>>Change Password</button>
                                     </form>
 
                                     <?php
@@ -115,6 +127,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                         echo '<div class="alert alert-success mt-3">' . $success_message . '</div>';
                                     } elseif (!empty($error_message)) {
                                         echo '<div class="alert alert-danger mt-3">' . $error_message . '</div>';
+                                    } elseif ($passwordChanged) {
+                                        echo '<div class="alert alert-warning mt-3">You have already changed your password once. To change the password contact the adminsitrator. </div>';
                                     }
                                     ?>
                                 </div>

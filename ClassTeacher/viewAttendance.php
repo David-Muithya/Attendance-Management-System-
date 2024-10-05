@@ -80,7 +80,6 @@ include '../Includes/session.php';
                             <th>#</th>
                             <th>First Name</th>
                             <th>Last Name</th>
-                            <th>Other Name</th>
                             <th>Admission No</th>
                             <th>Class</th>
                             <th>Class Arm</th>
@@ -101,7 +100,7 @@ include '../Includes/session.php';
 
                             $query = "SELECT tblattendance.Id,tblattendance.status,tblattendance.dateTimeTaken,tblclass.className,
                       tblclassarms.classArmName,tblsessionterm.sessionName,tblsessionterm.termId,tblterm.termName,
-                      tblstudents.firstName,tblstudents.lastName,tblstudents.otherName,tblstudents.admissionNumber
+                      tblstudents.firstName,tblstudents.lastName,tblstudents.admissionNumber
                       FROM tblattendance
                       INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
                       INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -128,7 +127,6 @@ include '../Includes/session.php';
                                 <td>" . $sn . "</td>
                                  <td>" . $rows['firstName'] . "</td>
                                 <td>" . $rows['lastName'] . "</td>
-                                <td>" . $rows['otherName'] . "</td>
                                 <td>" . $rows['admissionNumber'] . "</td>
                                 <td>" . $rows['className'] . "</td>
                                 <td>" . $rows['classArmName'] . "</td>

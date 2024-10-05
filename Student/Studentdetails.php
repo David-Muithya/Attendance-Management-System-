@@ -19,7 +19,6 @@ $query = "
     SELECT 
         tblstudents.firstName,
         tblstudents.lastName,
-        tblstudents.otherName,
         tblstudents.email,
         tblstudents.admissionNumber,
         tblclass.className,
@@ -103,7 +102,7 @@ $studentDetails = $rs->fetch_assoc();
                       <img src="img/user-icn.png" class="img-fluid rounded-square profile-photo " alt="Student Photo">
                     </div>
                     <div class="col-md-8">
-                      <p><strong>Full Name:</strong> <?php echo htmlspecialchars($studentDetails['firstName']) . ' ' . htmlspecialchars($studentDetails['lastName']) . ' ( ' . htmlspecialchars($studentDetails['otherName']);  ?> ) </p>
+                      <p><strong>Full Name:</strong> <?php echo htmlspecialchars($studentDetails['firstName']) . ' ' . htmlspecialchars($studentDetails['lastName']);  ?> </p>
                       <p><strong>Email:</strong> <?php echo htmlspecialchars($studentDetails['email']); ?></p>
                       <p><strong>Admission Number:</strong> <?php echo htmlspecialchars($studentDetails['admissionNumber']); ?></p>
                       <p><strong>Class:</strong> <?php echo htmlspecialchars($studentDetails['className']); ?></p>

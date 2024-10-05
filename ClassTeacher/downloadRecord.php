@@ -15,8 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   // Fetch attendance data
   $query = "SELECT tblattendance.Id, tblattendance.status, tblattendance.dateTimeTaken, 
             tblclass.className, tblclassarms.classArmName, tblsessionterm.sessionName, tblsessionterm.termId, 
-            tblterm.termName, tblstudents.firstName, tblstudents.lastName, tblstudents.otherName, 
-            tblstudents.admissionNumber
+            tblterm.termName, tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber
             FROM tblattendance
             INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
             INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -49,7 +48,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <th>#</th>
             <th>First Name</th>
             <th>Last Name</th>
-            <th>Other Name</th>
             <th>Admission No</th>
             <th>Class</th>
             <th>Class Arm</th>
@@ -69,7 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <td>' . $cnt . '</td> 
             <td>' . htmlspecialchars($row['firstName']) . '</td> 
             <td>' . htmlspecialchars($row['lastName']) . '</td> 
-            <td>' . htmlspecialchars($row['otherName']) . '</td> 
             <td>' . htmlspecialchars($row['admissionNumber']) . '</td> 
             <td>' . htmlspecialchars($row['className']) . '</td> 
             <td>' . htmlspecialchars($row['classArmName']) . '</td>    

@@ -81,19 +81,22 @@ include '../Includes/session.php';
                     <div class="form-group row mb-3">
                       <div class="col-xl-6">
                         <label class="form-control-label">Select Student<span class="text-danger ml-2">*</span></label>
-                        <?php
-                        $qry = "SELECT * FROM tblstudents where classId = '$_SESSION[classId]' and classArmId = '$_SESSION[classArmId]' ORDER BY firstName ASC";
-                        $result = $conn->query($qry);
-                        $num = $result->num_rows;
-                        if ($num > 0) {
-                          while ($rows = $result->fetch_assoc()) {
-                            echo ' <select required name="admissionNumber" class="form-control mb-3">';
-                            echo '<option value="' . $rows['admissionNumber'] . '" >' . $rows['firstName'] . ' ' . $rows['lastName'] . '</option>';
+                        <select required name="admissionNumber" class="form-control mb-3">
+                          <option value="">--Select Student--</option>
+                          <?php
+                          // Query to fetch students for the current class and arm
+                          $admissionNumber = $_SESSION['admissionNumber']; // Assuming this holds the logged-in student's admission number
+                          $qry = "SELECT * FROM tblstudents WHERE admissionNumber = '$admissionNumber' AND classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]'";
+                          $result = $conn->query($qry);
+                          if ($result->num_rows > 0) {
+                            while ($rows = $result->fetch_assoc()) {
+                              // Automatically select the current user's student if it matches
+                              $selected = ($_SESSION['admissionNumber'] == $rows['admissionNumber']) ? 'selected' : '';
+                              echo '<option value="' . $rows['admissionNumber'] . '" ' . $selected . '>' . $rows['firstName'] . ' ' . $rows['lastName'] . '</option>';
+                            }
                           }
-                          echo '</select>';
-                        }
-
-                        ?>
+                          ?>
+                        </select>
                       </div>
                       <div class="col-xl-6">
                         <label class="form-control-label">Type<span class="text-danger ml-2">*</span></label>
@@ -105,6 +108,9 @@ include '../Includes/session.php';
                         </select>
                       </div>
                     </div>
+
+                    <div id="txtHint"></div>
+
                     <?php
                     echo "<div id='txtHint'></div>";
                     ?>
@@ -150,7 +156,6 @@ include '../Includes/session.php';
                             <th>#</th>
                             <th>First Name</th>
                             <th>Last Name</th>
-                            <th>Other Name</th>
                             <th>Admission No</th>
                             <th>Class</th>
                             <th>Class Arm</th>
@@ -174,7 +179,7 @@ include '../Includes/session.php';
 
                               $query = "SELECT tblattendance.Id,tblattendance.status,tblattendance.dateTimeTaken,tblclass.className,
                         tblclassarms.classArmName,tblsessionterm.sessionName,tblsessionterm.termId,tblterm.termName,
-                        tblstudents.firstName,tblstudents.lastName,tblstudents.otherName,tblstudents.admissionNumber
+                        tblstudents.firstName,tblstudents.lastName,tblstudents.admissionNumber
                         FROM tblattendance
                         INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
                         INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -189,7 +194,7 @@ include '../Includes/session.php';
 
                               $query = "SELECT tblattendance.Id,tblattendance.status,tblattendance.dateTimeTaken,tblclass.className,
                         tblclassarms.classArmName,tblsessionterm.sessionName,tblsessionterm.termId,tblterm.termName,
-                        tblstudents.firstName,tblstudents.lastName,tblstudents.otherName,tblstudents.admissionNumber
+                        tblstudents.firstName,tblstudents.lastName,tblstudents.admissionNumber
                         FROM tblattendance
                         INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
                         INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -205,7 +210,7 @@ include '../Includes/session.php';
 
                               $query = "SELECT tblattendance.Id,tblattendance.status,tblattendance.dateTimeTaken,tblclass.className,
                         tblclassarms.classArmName,tblsessionterm.sessionName,tblsessionterm.termId,tblterm.termName,
-                        tblstudents.firstName,tblstudents.lastName,tblstudents.otherName,tblstudents.admissionNumber
+                        tblstudents.firstName,tblstudents.lastName,tblstudents.admissionNumber
                         FROM tblattendance
                         INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
                         INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -234,7 +239,6 @@ include '../Includes/session.php';
                                 <td>" . $sn . "</td>
                                  <td>" . $rows['firstName'] . "</td>
                                 <td>" . $rows['lastName'] . "</td>
-                                <td>" . $rows['otherName'] . "</td>
                                 <td>" . $rows['admissionNumber'] . "</td>
                                 <td>" . $rows['className'] . "</td>
                                 <td>" . $rows['classArmName'] . "</td>

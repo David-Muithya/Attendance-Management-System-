@@ -152,7 +152,6 @@ if (!$isSaturday) {
                               <th>#</th>
                               <th>First Name</th>
                               <th>Last Name</th>
-                              <th>Other Name</th>
                               <th>Admission No</th>
                               <th>Class</th>
                               <th>Class Arm</th>
@@ -161,7 +160,7 @@ if (!$isSaturday) {
                           </thead>
                           <tbody>
                             <?php
-                            $query = "SELECT tblstudents.Id, tblstudents.admissionNumber, tblclass.className, tblclass.Id AS classId, tblclassarms.classArmName, tblclassarms.Id AS classArmId, tblstudents.firstName, tblstudents.lastName, tblstudents.otherName, tblstudents.admissionNumber, tblstudents.dateCreated
+                            $query = "SELECT tblstudents.Id, tblstudents.admissionNumber, tblclass.className, tblclass.Id AS classId, tblclassarms.classArmName, tblclassarms.Id AS classArmId, tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber, tblstudents.dateCreated
                                 FROM tblstudents
                                 INNER JOIN tblclass ON tblclass.Id = tblstudents.classId
                                 INNER JOIN tblclassarms ON tblclassarms.Id = tblstudents.classArmId
@@ -177,7 +176,6 @@ if (!$isSaturday) {
                                       <td>" . $sn . "</td>
                                       <td>" . $rows['firstName'] . "</td>
                                       <td>" . $rows['lastName'] . "</td>
-                                      <td>" . $rows['otherName'] . "</td>
                                       <td>" . $rows['admissionNumber'] . "</td>
                                       <td>" . $rows['className'] . "</td>
                                       <td>" . $rows['classArmName'] . "</td>

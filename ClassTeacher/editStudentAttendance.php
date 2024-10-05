@@ -37,7 +37,7 @@ if (isset($_POST['view'])) {
   if ($type == "1") { // All Attendance
     $query = "SELECT tblattendance.Id, tblattendance.status, tblattendance.dateTimeTaken, tblclass.className,
                   tblclassarms.classArmName, tblsessionterm.sessionName, tblsessionterm.termId, tblterm.termName,
-                  tblstudents.firstName, tblstudents.lastName, tblstudents.otherName, tblstudents.admissionNumber
+                  tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber
                   FROM tblattendance
                   INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
                   INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -49,7 +49,7 @@ if (isset($_POST['view'])) {
     $singleDate = $_POST['singleDate'];
     $query = "SELECT tblattendance.Id, tblattendance.status, tblattendance.dateTimeTaken, tblclass.className,
                   tblclassarms.classArmName, tblsessionterm.sessionName, tblsessionterm.termId, tblterm.termName,
-                  tblstudents.firstName, tblstudents.lastName, tblstudents.otherName, tblstudents.admissionNumber
+                  tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber
                   FROM tblattendance
                   INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
                   INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -62,7 +62,7 @@ if (isset($_POST['view'])) {
     $toDate = $_POST['toDate'];
     $query = "SELECT tblattendance.Id, tblattendance.status, tblattendance.dateTimeTaken, tblclass.className,
                   tblclassarms.classArmName, tblsessionterm.sessionName, tblsessionterm.termId, tblterm.termName,
-                  tblstudents.firstName, tblstudents.lastName, tblstudents.otherName, tblstudents.admissionNumber
+                  tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber
                   FROM tblattendance
                   INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
                   INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
@@ -218,6 +218,7 @@ if (isset($_POST['view'])) {
                 <div class="card mb-4">
                   <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-primary">Attendance Records</h6>
+                    <h6 class="m-0 font-weight-bold text-danger">Note: <i>Click on the status beside each student to edit attendance!</i></h6>
                   </div>
                   <div class="table-responsive p-3">
                     <table class="table align-items-center table-flush table-hover" id="dataTableHover">
