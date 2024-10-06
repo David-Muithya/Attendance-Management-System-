@@ -14,6 +14,47 @@ $num = $rs->num_rows;
 $rrw = $rs->fetch_assoc();
 
 
+// If a request is made to fetch class arms based on classId
+if (isset($_GET['classId']) && !isset($_GET['classArmId'])) {
+  $classId = $_GET['classId'];
+  if (!empty($classId)) {
+    // Query to fetch class arms
+    $query = "SELECT Id, classArmName FROM tblclassarms WHERE classId = '$classId'";
+    $result = $conn->query($query);
+
+    $classArms = [];
+    while ($row = $result->fetch_assoc()) {
+      $classArms[] = $row;
+    }
+    // Return class arms as JSON
+    echo json_encode($classArms);
+  } else {
+    echo json_encode([]);
+  }
+  exit();
+}
+
+// If a request is made to fetch students based on classId and classArmId
+if (isset($_GET['classId']) && isset($_GET['classArmId'])) {
+  $classId = $_GET['classId'];
+  $classArmId = $_GET['classArmId'];
+  if (!empty($classId) && !empty($classArmId)) {
+    // Query to fetch students
+    $query = "SELECT Id, CONCAT(firstName, ' ', lastName) AS name FROM tblstudents WHERE classId = '$classId' AND classArmId = '$classArmId'";
+    $result = $conn->query($query);
+
+    $students = [];
+    while ($row = $result->fetch_assoc()) {
+      $students[] = $row;
+    }
+    // Return students as JSON
+    echo json_encode($students);
+  } else {
+    echo json_encode([]);
+  }
+  exit();
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -216,8 +257,7 @@ $rrw = $rs->fetch_assoc();
                       <div class="text-xs font-weight-bold text-uppercase mb-1">Terms</div>
                       <div class="h5 mb-0 font-weight-bold text-gray-800"><?php echo $termonly; ?></div>
                       <div class="mt-2 mb-0 text-muted text-xs">
-                        <!-- <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span>
-                                    <span>Since last years</span> -->
+                       
                       </div>
                     </div>
                     <div class="col-auto">
@@ -227,17 +267,12 @@ $rrw = $rs->fetch_assoc();
                 </div>
               </div>
             </div>
-            <!--Row-->
-
-            <!-- <div class="row">
-            <div class="col-lg-12 text-center">
-              <p>Do you like this template ? you can download from <a href="https://github.com/indrijunanda/RuangAdmin"
-                  class="btn btn-primary btn-sm" target="_blank"><i class="fab fa-fw fa-github"></i>&nbsp;GitHub</a></p>
-            </div>
-          </div> -->
+       
 
           </div>
-          <!---Container Fluid-->
+
+
+
         </div>
         <!-- Footer -->
         <?php include 'includes/footer.php'; ?>
@@ -256,6 +291,106 @@ $rrw = $rs->fetch_assoc();
     <script src="js/ruang-admin.min.js"></script>
     <script src="../vendor/chart.js/Chart.min.js"></script>
     <script src="js/demo/chart-area-demo.js"></script>
+
+    <!-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+      $(document).ready(function() {
+        // When class is selected, fetch class arms
+        $('#classSelect').change(function() {
+          let classId = $(this).val();
+
+          if (classId) {
+            $.ajax({
+              url: '?classId=' + classId,
+              method: 'GET',
+              success: function(data) {
+                let classArms = JSON.parse(data);
+                let classArmSelect = $('#classArmSelect');
+                classArmSelect.html('<option value="">Select Class Section</option>'); // Reset options
+
+                // Populate class arms
+                classArms.forEach(arm => {
+                  classArmSelect.append('<option value="' + arm.Id + '">' + arm.classArmName + '</option>');
+                });
+              },
+              error: function() {
+                console.log('Error fetching class arms.');
+              }
+            });
+          } else {
+            // Reset both dropdowns if no class is selected
+            $('#classArmSelect').html('<option value="">Select Class Section</option>');
+            $('#studentSelect').html('<option value="">Select Student</option>');
+          }
+        });
+
+        // When class arm is selected, fetch students
+        $('#classArmSelect').change(function() {
+          let classId = $('#classSelect').val();
+          let classArmId = $(this).val();
+
+          if (classArmId) {
+            $.ajax({
+              url: '?classId=' + classId + '&classArmId=' + classArmId,
+              method: 'GET',
+              success: function(data) {
+                let students = JSON.parse(data);
+                let studentSelect = $('#studentSelect');
+                studentSelect.html('<option value="">Select Student</option>'); // Reset options
+
+                // Populate students
+                students.forEach(student => {
+                  studentSelect.append('<option value="' + student.Id + '">' + student.name + '</option>');
+                });
+              },
+              error: function() {
+                console.log('Error fetching students.');
+              }
+            });
+          } else {
+            $('#studentSelect').html('<option value="">Select Student</option>'); // Reset if no arm is selected
+          }
+        });
+      });
+
+
+      // Chart.js initialization for Class Attendance Chart
+      var ctxClass = document.getElementById('classAttendanceChart').getContext('2d');
+      var classAttendanceChart = new Chart(ctxClass, {
+        type: 'bar', // Or 'pie' for pie chart
+        data: {
+          labels: ['Present', 'Absent'],
+          datasets: [{
+            label: 'Class Attendance',
+            data: [0, 0], // Placeholder, will be updated dynamically
+            backgroundColor: ['#4CAF50', '#F44336']
+          }]
+        },
+        options: {
+          responsive: true,
+        }
+      });
+
+      // Chart.js initialization for Student Attendance Chart
+      var ctxStudent = document.getElementById('studentAttendanceChart').getContext('2d');
+      var studentAttendanceChart = new Chart(ctxStudent, {
+        type: 'bar',
+        data: {
+          labels: ['Present', 'Absent'],
+          datasets: [{
+            label: 'Student Attendance',
+            data: [0, 0], // Placeholder
+            backgroundColor: ['#2196F3', '#FFEB3B']
+          }]
+        },
+        options: {
+          responsive: true,
+        }
+      });
+ -->
+
+   </script> 
+
 </body>
 
 </html>

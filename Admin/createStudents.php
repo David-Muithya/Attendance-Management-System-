@@ -408,7 +408,7 @@ if (isset($_POST['import']) && isset($_FILES['csvFile'])) {
                     <?php
                     if (isset($Id)) {
                     ?>
-                      <button type="submit" name="update" class="btn btn-warning">Update</button>
+                      <button type="submit" name="update" class="btn btn-success">Update</button>
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                     <?php
                     } else {
