@@ -34,6 +34,7 @@ session_start();
           <h5 class="text-center text-primary font-weight-bold">STUDENT ATTENDANCE SYSTEM</h5>
           <img src="img/attnlg.jpg" class="d-block mx-auto my-9" style="width: 100px; height: 100px;">
           <h1 class="h4 text-gray-900 mb-4 text-center"><b>Login Panel</b></h1>
+          
           <form class="user" method="Post" action="">
             <div class="form-group rounded">
               <select required name="userType" class="form-control mb-3">

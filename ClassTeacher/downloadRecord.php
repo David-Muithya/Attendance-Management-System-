@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
             INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
             INNER JOIN tblstudents ON tblstudents.admissionNumber = tblattendance.admissionNo
-            WHERE tblattendance.dateTimeTaken = '$dateTaken' 
+            WHERE DATE(tblattendance.dateTimeTaken) = '$dateTaken' 
             AND tblattendance.classId = '$_SESSION[classId]' 
             AND tblattendance.classArmId = '$_SESSION[classArmId]'";
 

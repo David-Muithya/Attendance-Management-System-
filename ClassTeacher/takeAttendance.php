@@ -21,12 +21,13 @@ $querey = mysqli_query($conn, "SELECT * FROM tblsessionterm WHERE isActive ='1'"
 $rwws = mysqli_fetch_array($querey);
 $sessionTermId = $rwws['Id'];
 
-$dateTaken = date("Y-m-d");
+// Include current time in dateTaken
+$dateTaken = date("Y-m-d H:i:s A"); // Date and time
 
 // Skip attendance handling if today is Saturday
 if (!$isSaturday) {
   // Check if attendance for today exists
-  $qurty = mysqli_query($conn, "SELECT * FROM tblattendance WHERE classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]' AND dateTimeTaken='$dateTaken'");
+  $qurty = mysqli_query($conn, "SELECT * FROM tblattendance WHERE classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]' AND DATE(dateTimeTaken) = CURDATE()");
   $count = mysqli_num_rows($qurty);
 
   if ($count == 0) { // If record does not exist, insert the new record
@@ -46,17 +47,15 @@ if (!$isSaturday) {
     $status = "";
 
     // Check if the attendance has already been taken
-    $qurty = mysqli_query($conn, "SELECT * FROM tblattendance WHERE classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]' AND dateTimeTaken='$dateTaken' AND status = '1'");
+    $qurty = mysqli_query($conn, "SELECT * FROM tblattendance WHERE classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]' AND DATE(dateTimeTaken) = CURDATE() AND status = '1'");
     $count = mysqli_num_rows($qurty);
 
     if ($count > 0) {
       $statusMsg = "<div class='alert alert-danger' style='margin-right:700px;'>Attendance has been taken for today!</div>";
     } else { // Update the status to 1 for the checkboxes checked
       for ($i = 0; $i < $N; $i++) {
-        $admissionNo[$i]; // Admission Number
-
         if (isset($check[$i])) { // The checked checkboxes
-          $qquery = mysqli_query($conn, "UPDATE tblattendance SET status='1' WHERE admissionNo = '$check[$i]'");
+          $qquery = mysqli_query($conn, "UPDATE tblattendance SET status='1', dateTimeTaken='$dateTaken' WHERE admissionNo = '$check[$i]'");
 
           if ($qquery) {
             $statusMsg = "<div class='alert alert-success' style='margin-right:700px;'>Attendance Taken Successfully!</div>";
@@ -94,10 +93,8 @@ if (!$isSaturday) {
         return;
       } else {
         if (window.XMLHttpRequest) {
-          // Code for IE7+, Firefox, Chrome, Opera, Safari
           xmlhttp = new XMLHttpRequest();
         } else {
-          // Code for IE6, IE5
           xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
         }
         xmlhttp.onreadystatechange = function() {
@@ -126,7 +123,7 @@ if (!$isSaturday) {
         <!-- Container Fluid-->
         <div class="container-fluid" id="container-wrapper">
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">Take Attendance (Today's Date: <?php echo $todaysDate = date("m-d-Y"); ?>)</h1>
+            <h1 class="h3 mb-0 text-gray-800">Take Attendance (Today's Date: <?php echo date("m-d-Y"); ?>)</h1>
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="./">Home</a></li>
               <li class="breadcrumb-item active" aria-current="page">Take Attendance</li>
@@ -155,32 +152,37 @@ if (!$isSaturday) {
                               <th>Admission No</th>
                               <th>Class</th>
                               <th>Class Arm</th>
+                              <th>Time Taken</th> <!-- New column for time -->
                               <th>Check</th>
                             </tr>
                           </thead>
                           <tbody>
                             <?php
-                            $query = "SELECT tblstudents.Id, tblstudents.admissionNumber, tblclass.className, tblclass.Id AS classId, tblclassarms.classArmName, tblclassarms.Id AS classArmId, tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber, tblstudents.dateCreated
-                                FROM tblstudents
-                                INNER JOIN tblclass ON tblclass.Id = tblstudents.classId
-                                INNER JOIN tblclassarms ON tblclassarms.Id = tblstudents.classArmId
-                                WHERE tblstudents.classId = '$_SESSION[classId]' AND tblstudents.classArmId = '$_SESSION[classArmId]'";
+                            $query = "SELECT tblstudents.Id, tblstudents.admissionNumber, tblclass.className, tblclass.Id AS classId, tblclassarms.classArmName, tblclassarms.Id AS classArmId, tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber, tblattendance.dateTimeTaken
+      FROM tblstudents
+      INNER JOIN tblclass ON tblclass.Id = tblstudents.classId
+      INNER JOIN tblclassarms ON tblclassarms.Id = tblstudents.classArmId
+      LEFT JOIN tblattendance ON tblattendance.admissionNo = tblstudents.admissionNumber 
+        AND DATE(tblattendance.dateTimeTaken) = CURDATE()
+      WHERE tblstudents.classId = '$_SESSION[classId]' AND tblstudents.classArmId = '$_SESSION[classArmId]'";
                             $rs = $conn->query($query);
                             $num = $rs->num_rows;
                             $sn = 0;
                             if ($num > 0) {
                               while ($rows = $rs->fetch_assoc()) {
-                                $sn = $sn + 1;
+                                $sn++;
+                                $timeTaken = $rows['dateTimeTaken'] ? date("h:i A", strtotime($rows['dateTimeTaken'])) : "Not Taken"; // Format time
                                 echo "
-                                    <tr>
-                                      <td>" . $sn . "</td>
-                                      <td>" . $rows['firstName'] . "</td>
-                                      <td>" . $rows['lastName'] . "</td>
-                                      <td>" . $rows['admissionNumber'] . "</td>
-                                      <td>" . $rows['className'] . "</td>
-                                      <td>" . $rows['classArmName'] . "</td>
-                                      <td><input name='check[]' type='checkbox' value='" . $rows['admissionNumber'] . "' class='form-control'></td>
-                                    </tr>";
+          <tr>
+            <td>" . $sn . "</td>
+            <td>" . $rows['firstName'] . "</td>
+            <td>" . $rows['lastName'] . "</td>
+            <td>" . $rows['admissionNumber'] . "</td>
+            <td>" . $rows['className'] . "</td>
+            <td>" . $rows['classArmName'] . "</td>
+            <td>" . $timeTaken . "</td> <!-- Show formatted time -->
+            <td><input name='check[]' type='checkbox' value='" . $rows['admissionNumber'] . "' class='form-control'></td>
+          </tr>";
                                 echo "<input name='admissionNo[]' value='" . $rows['admissionNumber'] . "' type='hidden' class='form-control'>";
                               }
                             } else {

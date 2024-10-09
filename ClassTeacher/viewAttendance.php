@@ -98,16 +98,19 @@ include '../Includes/session.php';
 
                             $dateTaken =  $_POST['dateTaken'];
 
-                            $query = "SELECT tblattendance.Id,tblattendance.status,tblattendance.dateTimeTaken,tblclass.className,
-                      tblclassarms.classArmName,tblsessionterm.sessionName,tblsessionterm.termId,tblterm.termName,
-                      tblstudents.firstName,tblstudents.lastName,tblstudents.admissionNumber
-                      FROM tblattendance
-                      INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
-                      INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
-                      INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
-                      INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
-                      INNER JOIN tblstudents ON tblstudents.admissionNumber = tblattendance.admissionNo
-                      where tblattendance.dateTimeTaken = '$dateTaken' and tblattendance.classId = '$_SESSION[classId]' and tblattendance.classArmId = '$_SESSION[classArmId]'";
+                            $query = "SELECT tblattendance.Id, tblattendance.status, tblattendance.dateTimeTaken, tblclass.className,
+                            tblclassarms.classArmName, tblsessionterm.sessionName, tblsessionterm.termId, tblterm.termName,
+                            tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber
+                            FROM tblattendance
+                            INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
+                            INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
+                            INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
+                            INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
+                            INNER JOIN tblstudents ON tblstudents.admissionNumber = tblattendance.admissionNo
+                            WHERE DATE(tblattendance.dateTimeTaken) = '$dateTaken' 
+                            AND tblattendance.classId = '$_SESSION[classId]' 
+                            AND tblattendance.classArmId = '$_SESSION[classArmId]'";
+                  
                             $rs = $conn->query($query);
                             $num = $rs->num_rows;
                             $sn = 0;

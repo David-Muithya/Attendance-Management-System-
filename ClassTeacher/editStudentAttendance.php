@@ -56,7 +56,7 @@ if (isset($_POST['view'])) {
                   INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
                   INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
                   INNER JOIN tblstudents ON tblstudents.admissionNumber = tblattendance.admissionNo
-                  WHERE tblattendance.dateTimeTaken = '$singleDate' AND tblattendance.admissionNo = '$admissionNumber' AND tblattendance.classId = '$_SESSION[classId]' AND tblattendance.classArmId = '$_SESSION[classArmId]'";
+                  WHERE  DATE(tblattendance.dateTimeTaken) = '$singleDate' AND tblattendance.admissionNo = '$admissionNumber' AND tblattendance.classId = '$_SESSION[classId]' AND tblattendance.classArmId = '$_SESSION[classArmId]'";
   } elseif ($type == "3") { // Date Range Attendance
     $fromDate = $_POST['fromDate'];
     $toDate = $_POST['toDate'];
@@ -69,7 +69,7 @@ if (isset($_POST['view'])) {
                   INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
                   INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
                   INNER JOIN tblstudents ON tblstudents.admissionNumber = tblattendance.admissionNo
-                  WHERE tblattendance.dateTimeTaken BETWEEN '$fromDate' AND '$toDate' AND tblattendance.admissionNo = '$admissionNumber' AND tblattendance.classId = '$_SESSION[classId]' AND tblattendance.classArmId = '$_SESSION[classArmId]'";
+                  WHERE DATE(tblattendance.dateTimeTaken) BETWEEN '$fromDate' AND '$toDate' AND tblattendance.admissionNo = '$admissionNumber' AND tblattendance.classId = '$_SESSION[classId]' AND tblattendance.classArmId = '$_SESSION[classArmId]'";
   }
 
   // Debugging SQL query
