@@ -1,7 +1,16 @@
 <?php
-error_reporting(0);
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 include '../Includes/dbcon.php';
 include '../Includes/session.php';
+$statusMsg = ""; // Initialize to avoid "Undefined variable" warning
+
+
+// Debug: Check session variables
+// echo "Teacher's User ID: " . $_SESSION['userId'] . "<br>";
+// echo "Teacher's Class ID: " . $_SESSION['classId'] . "<br>";
+// echo "Teacher's Class Arm ID: " . $_SESSION['classArmId'] . "<br>";
 
 // Check if today is Saturday
 $isSaturday = (date('N') == 6); // 6 stands for Saturday
@@ -13,34 +22,51 @@ $query = "SELECT tblclass.className, tblclassarms.classArmName
     INNER JOIN tblclassarms ON tblclassarms.Id = tblclassteacher.classArmId
     WHERE tblclassteacher.Id = '$_SESSION[userId]'";
 $rs = $conn->query($query);
+if (!$rs) {
+    die("Query failed: " . $conn->error); // Debug: Display query error
+}
 $num = $rs->num_rows;
 $rrw = $rs->fetch_assoc();
 
 // Session and Term
 $querey = mysqli_query($conn, "SELECT * FROM tblsessionterm WHERE isActive ='1'");
+if (!$querey) {
+    die("Query failed: " . $conn->error); // Debug: Display query error
+}
 $rwws = mysqli_fetch_array($querey);
 $sessionTermId = $rwws['Id'];
 
 // Include current time in dateTaken
-$dateTaken = date("Y-m-d H:i:s A"); // Date and time
+$dateTaken = date("Y-m-d H:i:s"); // Use a shorter datetime format
 
 // Skip attendance handling if today is Saturday
 if (!$isSaturday) {
   // Check if attendance for today exists
   $qurty = mysqli_query($conn, "SELECT * FROM tblattendance WHERE classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]' AND DATE(dateTimeTaken) = CURDATE()");
+  if (!$qurty) {
+      die("Query failed: " . $conn->error); // Debug: Display query error
+  }
   $count = mysqli_num_rows($qurty);
 
   if ($count == 0) { // If record does not exist, insert the new record
-    // Insert the students record into the attendance table on page load
+    // echo "Inserting attendance records for today...<br>"; // Debug: Display message
     $qus = mysqli_query($conn, "SELECT * FROM tblstudents WHERE classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]'");
+    if (!$qus) {
+        die("Query failed: " . $conn->error); // Debug: Display query error
+    }
     while ($ros = $qus->fetch_assoc()) {
-      $qquery = mysqli_query($conn, "INSERT INTO tblattendance(admissionNo, classId, classArmId, sessionTermId, status, dateTimeTaken) 
-                VALUES('$ros[admissionNumber]', '$_SESSION[classId]', '$_SESSION[classArmId]', '$sessionTermId', '0', '$dateTaken')");
+        // echo "Inserting record for student: " . $ros['admissionNumber'] . "<br>"; // Debug: Display student admission number
+        $qquery = mysqli_query($conn, "INSERT INTO tblattendance(admissionNo, classId, classArmId, sessionTermId, status, dateTimeTaken) 
+                  VALUES('$ros[admissionNumber]', '$_SESSION[classId]', '$_SESSION[classArmId]', '$sessionTermId', '0', '$dateTaken')");
+        if (!$qquery) {
+            die("Query failed: " . $conn->error); // Debug: Display query error
+        }
     }
   }
 
   // Handle form submission
   if (isset($_POST['save'])) {
+    // echo "Form submitted!<br>"; // Debug: Display message
     $admissionNo = $_POST['admissionNo'];
     $check = $_POST['check'];
     $N = count($admissionNo);
@@ -48,6 +74,9 @@ if (!$isSaturday) {
 
     // Check if the attendance has already been taken
     $qurty = mysqli_query($conn, "SELECT * FROM tblattendance WHERE classId = '$_SESSION[classId]' AND classArmId = '$_SESSION[classArmId]' AND DATE(dateTimeTaken) = CURDATE() AND status = '1'");
+    if (!$qurty) {
+        die("Query failed: " . $conn->error); // Debug: Display query error
+    }
     $count = mysqli_num_rows($qurty);
 
     if ($count > 0) {
@@ -55,11 +84,14 @@ if (!$isSaturday) {
     } else { // Update the status to 1 for the checkboxes checked
       for ($i = 0; $i < $N; $i++) {
         if (isset($check[$i])) { // The checked checkboxes
+          // echo "Updating attendance for student: " . $check[$i] . "<br>"; // Debug: Display student admission number
           $qquery = mysqli_query($conn, "UPDATE tblattendance SET status='1', dateTimeTaken='$dateTaken' WHERE admissionNo = '$check[$i]'");
 
           if ($qquery) {
+            // echo "Attendance updated for student: " . $check[$i] . "<br>"; // Debug: Display success message
             $statusMsg = "<div class='alert alert-success' style='margin-right:700px;'>Attendance Taken Successfully!</div>";
           } else {
+            // echo "Error updating attendance for student: " . $check[$i] . "<br>"; // Debug: Display error message
             $statusMsg = "<div class='alert alert-danger' style='margin-right:700px;'>An error Occurred!</div>";
           }
         }
@@ -85,28 +117,6 @@ if (!$isSaturday) {
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="css/ruang-admin.min.css" rel="stylesheet">
-
-  <script>
-    function classArmDropdown(str) {
-      if (str == "") {
-        document.getElementById("txtHint").innerHTML = "";
-        return;
-      } else {
-        if (window.XMLHttpRequest) {
-          xmlhttp = new XMLHttpRequest();
-        } else {
-          xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-        }
-        xmlhttp.onreadystatechange = function() {
-          if (this.readyState == 4 && this.status == 200) {
-            document.getElementById("txtHint").innerHTML = this.responseText;
-          }
-        };
-        xmlhttp.open("GET", "ajaxClassArms2.php?cid=" + str, true);
-        xmlhttp.send();
-      }
-    }
-  </script>
 </head>
 
 <body id="page-top">
@@ -165,8 +175,13 @@ if (!$isSaturday) {
       LEFT JOIN tblattendance ON tblattendance.admissionNo = tblstudents.admissionNumber 
         AND DATE(tblattendance.dateTimeTaken) = CURDATE()
       WHERE tblstudents.classId = '$_SESSION[classId]' AND tblstudents.classArmId = '$_SESSION[classArmId]'";
+                            // echo "Query: " . $query . "<br>"; // Debug: Display the query
                             $rs = $conn->query($query);
+                            if (!$rs) {
+                                die("Query failed: " . $conn->error); // Debug: Display query error
+                            }
                             $num = $rs->num_rows;
+                            // echo "Number of students found: " . $num . "<br>"; // Debug: Display number of students
                             $sn = 0;
                             if ($num > 0) {
                               while ($rows = $rs->fetch_assoc()) {
@@ -219,17 +234,6 @@ if (!$isSaturday) {
   <script src="../vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="../vendor/jquery-easing/jquery.easing.min.js"></script>
   <script src="js/ruang-admin.min.js"></script>
-  <!-- Page level plugins -->
-  <script src="../vendor/datatables/jquery.dataTables.min.js"></script>
-  <script src="../vendor/datatables/dataTables.bootstrap4.min.js"></script>
-
-  <!-- Page level custom scripts -->
-  <script>
-    $(document).ready(function() {
-      $('#dataTable').DataTable(); // ID From dataTable 
-      $('#dataTableHover').DataTable(); // ID From dataTable with Hover
-    });
-  </script>
 </body>
 
 </html>

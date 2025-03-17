@@ -3,8 +3,9 @@ error_reporting(0);
 include '../Includes/dbcon.php';
 include '../Includes/session.php';
 
-
-
+// Fetch the teacher's assigned class and class arm from the session
+$teacherClassId = $_SESSION['classId'];
+$teacherClassArmId = $_SESSION['classArmId'];
 ?>
 
 <!DOCTYPE html>
@@ -17,7 +18,7 @@ include '../Includes/session.php';
   <meta name="description" content="">
   <meta name="author" content="">
   <link href="img/logo/T-logo.png" rel="icon">
-  <title>AMS - View Attendance</title>
+  <title>AMS - View Students</title>
   <link href="../vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
   <link href="../vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
   <link href="css/ruang-admin.min.css" rel="stylesheet">
@@ -37,10 +38,10 @@ include '../Includes/session.php';
         <!-- Container Fluid-->
         <div class="container-fluid" id="container-wrapper">
           <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">View Class Attendance</h1>
+            <h1 class="h3 mb-0 text-gray-800">View Students</h1>
             <ol class="breadcrumb">
               <li class="breadcrumb-item"><a href="./">Home</a></li>
-              <li class="breadcrumb-item active" aria-current="page">View Class Attendance</li>
+              <li class="breadcrumb-item active" aria-current="page">View Students</li>
             </ol>
           </div>
 
@@ -49,19 +50,11 @@ include '../Includes/session.php';
               <!-- Form Basic -->
               <div class="card mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 class="m-0 font-weight-bold text-primary">View Attendance</h6>
-                  <?php echo $statusMsg; ?>
+                  <h6 class="m-0 font-weight-bold text-primary">View Students in Your Class</h6>
                 </div>
                 <div class="card-body">
                   <form method="post">
-                    <div class="form-group row mb-3">
-                      <div class="col-xl-6">
-                        <label class="form-control-label">Select Date<span class="text-danger ml-2">*</span></label>
-                        <input type="date" class="form-control" name="dateTaken" id="exampleInputFirstName" placeholder="Class Arm Name">
-                      </div>
-                      
-                    </div>
-                    <button type="submit" name="view" class="btn btn-primary">View Attendance</button>
+                    <button type="submit" name="viewStudents" class="btn btn-primary">View Students</button>
                   </form>
                 </div>
               </div>
@@ -71,7 +64,7 @@ include '../Includes/session.php';
                 <div class="col-lg-12">
                   <div class="card mb-4">
                     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                      <h6 class="m-0 font-weight-bold text-primary">Class Attendance</h6>
+                      <h6 class="m-0 font-weight-bold text-primary">Student List</h6>
                     </div>
                     <div class="table-responsive p-3">
                       <table class="table align-items-center table-flush table-hover" id="dataTableHover">
@@ -81,69 +74,42 @@ include '../Includes/session.php';
                             <th>First Name</th>
                             <th>Last Name</th>
                             <th>Admission No</th>
+                            <th>Email</th>
                             <th>Class</th>
                             <th>Class Arm</th>
-                            <th>Session</th>
-                            <th>Term</th>
-                            <th>Status</th>
-                            <th>Date</th>
                           </tr>
                         </thead>
 
                         <tbody>
-
                           <?php
-
-                          if (isset($_POST['view'])) {
-
-                            $dateTaken =  $_POST['dateTaken'];
-
-                            $query = "SELECT tblattendance.Id, tblattendance.status, tblattendance.dateTimeTaken, tblclass.className,
-                            tblclassarms.classArmName, tblsessionterm.sessionName, tblsessionterm.termId, tblterm.termName,
-                            tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber
-                            FROM tblattendance
-                            INNER JOIN tblclass ON tblclass.Id = tblattendance.classId
-                            INNER JOIN tblclassarms ON tblclassarms.Id = tblattendance.classArmId
-                            INNER JOIN tblsessionterm ON tblsessionterm.Id = tblattendance.sessionTermId
-                            INNER JOIN tblterm ON tblterm.Id = tblsessionterm.termId
-                            INNER JOIN tblstudents ON tblstudents.admissionNumber = tblattendance.admissionNo
-                            WHERE DATE(tblattendance.dateTimeTaken) = '$dateTaken' 
-                            AND tblattendance.classId = '$_SESSION[classId]' 
-                            AND tblattendance.classArmId = '$_SESSION[classArmId]'";
-                  
+                          if (isset($_POST['viewStudents'])) {
+                            // Fetch students based on the teacher's assigned class and class arm
+                            $query = "SELECT tblstudents.firstName, tblstudents.lastName, tblstudents.admissionNumber, tblstudents.email, tblclass.className, tblclassarms.classArmName
+                                      FROM tblstudents
+                                      INNER JOIN tblclass ON tblclass.Id = tblstudents.classId
+                                      INNER JOIN tblclassarms ON tblclassarms.Id = tblstudents.classArmId
+                                      WHERE tblstudents.classId = '$teacherClassId' 
+                                      AND tblstudents.classArmId = '$teacherClassArmId'";
                             $rs = $conn->query($query);
                             $num = $rs->num_rows;
                             $sn = 0;
-                            $status = "";
+
                             if ($num > 0) {
                               while ($rows = $rs->fetch_assoc()) {
-                                if ($rows['status'] == '1') {
-                                  $status = "Present";
-                                  $colour = "#00FF00";
-                                } else {
-                                  $status = "Absent";
-                                  $colour = "#FF0000";
-                                }
-                                $sn = $sn + 1;
+                                $sn++;
                                 echo "
-                              <tr>
-                                <td>" . $sn . "</td>
-                                 <td>" . $rows['firstName'] . "</td>
-                                <td>" . $rows['lastName'] . "</td>
-                                <td>" . $rows['admissionNumber'] . "</td>
-                                <td>" . $rows['className'] . "</td>
-                                <td>" . $rows['classArmName'] . "</td>
-                                <td>" . $rows['sessionName'] . "</td>
-                                <td>" . $rows['termName'] . "</td>
-                                <td style='background-color:" . $colour . "'>" . $status . "</td>
-                                <td>" . $rows['dateTimeTaken'] . "</td>
-                              </tr>";
+                                  <tr>
+                                    <td>" . $sn . "</td>
+                                    <td>" . $rows['firstName'] . "</td>
+                                    <td>" . $rows['lastName'] . "</td>
+                                    <td>" . $rows['admissionNumber'] . "</td>
+                                    <td>" . $rows['email'] . "</td>
+                                    <td>" . $rows['className'] . "</td>
+                                    <td>" . $rows['classArmName'] . "</td>
+                                  </tr>";
                               }
                             } else {
-                              echo
-                              "<div class='alert alert-danger' role='alert'>
-                            No Record Found!
-                            </div>";
+                              echo "<div class='alert alert-danger' role='alert'>No students found in your class.</div>";
                             }
                           }
                           ?>
@@ -154,7 +120,6 @@ include '../Includes/session.php';
                 </div>
               </div>
             </div>
-           
           </div>
           <!---Container Fluid-->
         </div>
